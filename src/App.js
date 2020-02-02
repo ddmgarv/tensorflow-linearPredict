@@ -6,7 +6,8 @@ import {
   loadParameters,
   createModel,
   convertToTensor,
-  trainModel
+  trainModel,
+  testModel
 } from "./Model/2DPrediction";
 
 const App = () => {
@@ -17,20 +18,22 @@ const App = () => {
   //   setPredictedVal(predictVal(inputVal));
   // }, [inputVal]);
 
+  const loadModel = async () => {
+    const imgData = await getData();
+    loadParameters(imgData);
+    const model = await createModel();
+    tfvis.show.modelSummary({ name: "Model Summary" }, model);
+    const tensorData = await convertToTensor(imgData);
+    const trainedModel = await trainModel(
+      model,
+      tensorData.inputs,
+      tensorData.labels
+    );
+    testModel(trainedModel, imgData, tensorData);
+    console.log("Model trained!");
+  };
+
   useEffect(() => {
-    const loadModel = async () => {
-      const imgData = await getData();
-      loadParameters(imgData);
-      const model = await createModel();
-      tfvis.show.modelSummary({ name: "Model Summary" }, model);
-      const tensorData = await convertToTensor(imgData);
-      const trainedModel = await trainModel(
-        model,
-        tensorData.inputs,
-        tensorData.labels
-      );
-      console.log("Model trained!");
-    };
     loadModel();
   }, []);
   return (
